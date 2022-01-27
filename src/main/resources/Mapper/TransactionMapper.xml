@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.walletApp.mapper.TransactionMapper">
+
+    <insert id="createTransactionTable" useGeneratedKeys="true" keyProperty="uuid">
+        CREATE  TABLE IF NOT EXISTS transaction_detail
+        (
+        uuid uuid NOT NULL DEFAULT public.uuid_generate_v4(),
+        transaction_id character varying(50) NOT NULL UNIQUE,
+        user_id character varying(20) NOT NULL UNIQUE,
+        transaction_type character varying(7) NOT NULL,
+        amount numeric(5,2) NOT NULL,
+        transaction_date TIMESTAMP NOT NULL DEFAULT current_timestamp,
+        wallet_balance numeric(10,2),
+        description character varying(100),
+        CONSTRAINT transaction_pkey PRIMARY KEY (transaction_id),
+        CONSTRAINT user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES public.user_detail (user_id)
+        );
+    </insert>
+
+    <select id="getUserTransactionById" resultType="com.example.walletApp.model.Passbook">
+        SELECT
+        transaction_id AS "transactionId",
+        user_id AS "userId",
+        transaction_type AS "transactionType",
+        amount AS "amount",
+        transaction_date AS "transactionDate",
+        wallet_balance AS walletBalance,
+        description AS "description"
+        FROM transaction_details
+        WHERE user_id = (
+        SELECT user_id FROM user_details
+        WHERE username = #{username} and password = #{password}
+        )
+        order by transaction_date;
+
+    </select>
+
+    <insert id="addTransactionForId">
+        INSERT INTO transaction_detail(
+        transaction_id, user_id, transaction_type, amount, wallet_balance, description, transaction_date
+        ) VALUES (
+        #{transactionId}, #{userId}, #{transactionType}, #{amount},
+        #{updatedBalance}, #{transactingUser}, #{transactionDate}
+        );
+    </insert>
+
+    <select id="getUserCurrentBalance" resultType="Long">
+        SELECT wallet_balance
+        FROM user_detail
+        where username= #{username};
+    </select>
+
+    <update id="updateUserCurrentBalance">
+        UPDATE user_detail
+        SET wallet_balance = #{walletBalance}
+        where username= #{username};
+    </update>
+
+</mapper>

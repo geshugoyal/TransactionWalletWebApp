@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.walletApp.mapper.UserMapper">
+
+    <insert id="createUserTable" useGeneratedKeys="true" keyProperty="uuid">
+        CREATE  TABLE IF NOT EXISTS user_detail
+        (
+        user_id uuid NOT NULL DEFAULT public.uuid_generate_v1() ,
+        username character varying(20) NOT NULL UNIQUE,
+        password character varying(25) NOT NULL,
+        email_id character varying(50) NOT NULL UNIQUE,
+        first_name character varying(30),
+        last_name character varying(50),
+        wallet_balance numeric(10,2),
+        phone_number character varying(12),
+        CONSTRAINT user_pkey PRIMARY KEY (user_id)
+        );
+    </insert>
+
+    <select id="isValidUser" resultType="Boolean">
+        SELECT "true"
+        FROM user_detail
+        where username= #{username} and password= #{password};
+    </select>
+
+    <select id="viewProfile" resultType="com.example.walletApp.model.User">
+        SELECT 
+        user_id AS "userId",
+        username AS "username",
+        email_id AS "emailId",
+        first_name AS "firstName",
+        last_name AS "lastName",
+        wallet_balance AS "walletBalance",
+        phone_number AS "phoneNumber"
+        FROM user_detail
+        where username= #{username} and password= #{password};
+    </select>
+    
+    <update id="updateProfile">
+        UPDATE user_detail
+        SET
+        username = #{userDetail.newUsername},
+        email_id = #{userDetail.emailId},
+        first_name = #{userDetail.firstName},
+        last_name = #{userDetail.lastName},
+        phone_number = #{userDetail.phoneNumber}
+        WHERE username= #{username} and password= #{password} and
+        NOT EXISTS (
+        SELECT 1
+        FROM user_detail
+        WHERE username != #{username}
+        );
+    </update>
+
+    <insert id="addProfile">
+        INSERT INTO user_detail(username, email_id, first_name, last_name, phone_number)
+        #{userDetail.username},
+        #{userDetail.emailId},
+        #{userDetail.firstName},
+        #{userDetail.lastName},
+        #{userDetail.phoneNumber}
+        WHERE username NOT IN (
+        SELECT username
+        FROM user_detail)
+        OR email_id NOT IN (
+        SELECT email_id
+        FROM user_detail
+        );
+    </insert>
+
+    <update id="addMoneyToWallet">
+        UPDATE user_detail
+        SET wallet_balance = #{walletBalance}
+        WHERE username= #{username} and password= #{password};
+    </update>
+
+    <select id="getUserIdByUserName" resultType="String">
+        SELECT user_id
+        FROM user_detail
+        where username= #{username};
+    </select>
+
+</mapper>

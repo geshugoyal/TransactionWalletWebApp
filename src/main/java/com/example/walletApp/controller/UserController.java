@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController(value = "/user")
 @Api(value = "Transaction API")
@@ -19,7 +20,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping(value = "/signIn")
+    @PostMapping(value = "/signIn", produces = APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Sign In",
             notes = "To check user sign in status.",
@@ -34,7 +35,7 @@ public class UserController {
         }
     }
 
-    @PostMapping(value = "/signUp")
+    @PostMapping(value = "/signUp", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Sign Up",
             notes = "To register new user.",
@@ -48,7 +49,7 @@ public class UserController {
         }
     }
 
-    @GetMapping(value = "/viewProfile")
+    @GetMapping(value = "/viewProfile", produces = APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "View User Detail",
             notes = "To view user personal details.",
@@ -63,7 +64,7 @@ public class UserController {
         }
     }
 
-    @PutMapping(value = "/updateProfile")
+    @PutMapping(value = "/updateProfile", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(
             value = "Update User Detail",
             notes = "To update existing user details.",

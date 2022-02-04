@@ -6,10 +6,7 @@ import com.example.walletApp.model.UpdateUserRequest;
 import com.example.walletApp.model.User;
 import com.example.walletApp.repository.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 @Slf4j
 @Service
@@ -19,12 +16,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean signIn(String username, String password) {
-        return userMapper.isValidUser(username, password);
+        try {
+            return userMapper.isValidUser(username, password);
+        } catch(Exception e){
+            log.error("Profile update unsuccessful with username: {}", username);
+            throw new PSQLException("Profile signIn unsuccessful. Please contact administrator.");
+        }
     }
 
     @Override
     public int signUp(User user) {
         try {
+            userMapper.createUserTable();
             if(checkIfUserNameExists(user.getUsername())){
                 throw new IllegalArgumentException("Profile already exists with username: "+ user.getUsername());
             }

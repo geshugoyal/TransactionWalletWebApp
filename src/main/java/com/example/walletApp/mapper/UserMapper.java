@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Param;
 
 public interface UserMapper {
 
+    int createUserTable();
+
     boolean isValidUser(@Param("username") String username,
                     @Param("password") String password);
 
